@@ -18,17 +18,19 @@ exports.sourceNodes = (
   if (opts.auth) {
     authUrlPart = `${opts.auth.user}:${opts.auth.password}@`
   }
+  const port = serverOptions.port ? `:${serverOptions.port}` : ''
+  const query = opts.query ? '?' + opts.query : ''
+  const protocol = opts.srv ? 'mongodb+srv' : 'mongodb'
+  const url = `${protocol}://${authUrlPart}${serverOptions.address}${port}/${dbName}${query}`
 
-  MongoClient.connect(
-    `mongodb://${authUrlPart}${serverOptions.address}:${
-      opts.port
-    }/${dbName}${opts.query ? '?' + opts.query : ''}`,
-    function(err, db) {
+  MongoClient.connect(url,
+    function(err, client) {
       // Establish connection to db
       if (err) {
         console.warn(err)
         return
       }
+      const db = client.db(dbName)
       let collection = opts.collection || `documents`
       if (Array.isArray(collection)) {
         for (const col of collection) {
@@ -57,7 +59,6 @@ function createNodes(
     // If the item is null then the cursor is exhausted/empty and closed
     if (item == null) {
       // Let's close the db
-      db.close()
       done()
     } else {
       var id = item._id.toString()
