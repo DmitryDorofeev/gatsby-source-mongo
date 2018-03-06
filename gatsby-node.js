@@ -12,26 +12,21 @@ exports.sourceNodes = (
     address: `localhost`,
     port: 27017,
   }
-  let dbName = opts.dbName || `local`;
-  let authUrlPart = ``;
-
-  if (opts.auth) {
-    authUrlPart = `${opts.auth.user}:${opts.auth.password}@`
-  }
+  const dbName = opts.dbName || `test`;
+  const auth = opts.auth ? `${opts.auth.user}:${opts.auth.password}@` : ''
   const port = serverOptions.port ? `:${serverOptions.port}` : ''
   const query = opts.query ? '?' + opts.query : ''
   const protocol = opts.srv ? 'mongodb+srv' : 'mongodb'
-  const url = `${protocol}://${authUrlPart}${serverOptions.address}${port}/${dbName}${query}`
+  const url = `${protocol}://${auth}${serverOptions.address}${port}/${dbName}${query}`
 
-  MongoClient.connect(url,
-    function(err, client) {
-      // Establish connection to db
+  MongoClient.connect(url, (err, client) => {
       if (err) {
         console.warn(err)
         return
       }
       const db = client.db(dbName)
-      let collection = opts.collection || `documents`
+      const collection = opts.collection || `documents`
+
       if (Array.isArray(collection)) {
         for (const col of collection) {
           createNodes(db, opts, dbName, createNode, col, done)
@@ -71,7 +66,7 @@ function createNodes(
         parent: `__${collectionName}__`,
         children: [],
         internal: {
-          type: `mongodb${caps(dbName)}${caps(collectionName)}`,
+          type: `mongo${caps(collectionName)}`,
           content: JSON.stringify(item),
           contentDigest: crypto
             .createHash(`md5`)
