@@ -18,5 +18,9 @@
   "homepage": "https://github.com/DmitryDorofeev/gatsby-source-mongo#readme",
   "dependencies": {
     "mongodb": "^3.0.4"
-  }
+  },
+  "keywords": [
+    "gatsby",
+    "gatsby-plugin"
+  ]
 }
